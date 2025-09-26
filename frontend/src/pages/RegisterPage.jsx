@@ -26,8 +26,13 @@ export default function RegisterPage() {
 
     setLoading(true);
     try {
-      // Submit with selected role
-      await registerUser({ name, email, password, role });
+      // Submit with selected role (default to 'user' if not selected)
+      await registerUser({ 
+        name, 
+        email, 
+        password, 
+        role: role || 'user' // Ensure role is always provided
+      });
       alert("Registration successful. Please log in.");
       nav("/login");
     } catch (err) {

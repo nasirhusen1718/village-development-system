@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Increase timeout to tolerate first-run AI model training
 const api = axios.create({ 
-  baseURL: "http://localhost:8000", // Updated to point to the FastAPI backend
+  baseURL: "/api", // This will be proxied to http://127.0.0.1:8003 by Vite
   timeout: 60000 
 });
 

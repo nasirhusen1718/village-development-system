@@ -117,34 +117,52 @@ def list_users(db: Session):
 # Filtering for officer sector list
 
 def list_sector_problems(db: Session, sector: str, status: str=None, priority: str=None, location: str=None, q: str=None, order_by: str="date_submitted", order_dir: str="desc"):
-	qset = db.query(models.Problem).filter(models.Problem.sector == sector)
-	if status:
-		statuses = [s.strip() for s in str(status).split(',') if s.strip()]
-		if len(statuses) > 1:
-			qset = qset.filter(models.Problem.status.in_(statuses))
-		elif len(statuses) == 1:
-			qset = qset.filter(models.Problem.status.ilike(f"%{statuses[0]}%"))
-	if priority:
-		priorities = [p.strip() for p in str(priority).split(',') if p.strip()]
-		if len(priorities) > 1:
-			qset = qset.filter(models.Problem.priority.in_(priorities))
-		elif len(priorities) == 1:
-			qset = qset.filter(models.Problem.priority == priorities[0])
-	if location:
-		qset = qset.filter(models.Problem.location.ilike(f"%{location}%"))
-	if q:
-		like = f"%{q}%"
-		qset = qset.filter((models.Problem.title.ilike(like)) | (models.Problem.description.ilike(like)))
-	# ordering
-	col_map = {
-		"date_submitted": models.Problem.date_submitted,
-		"priority": models.Problem.priority,
-		"status": models.Problem.status,
-		"location": models.Problem.location,
-	}
-	col = col_map.get(order_by, models.Problem.date_submitted)
-	qset = qset.order_by(col.asc() if order_dir == "asc" else col.desc())
-	return qset.all()
+    # Join with users table to get user information
+    qset = db.query(models.Problem).join(
+        models.User, models.Problem.user_id == models.User.id
+    ).filter(models.Problem.sector == sector)
+    
+    # Filter by status if provided
+    if status:
+        statuses = [s.strip() for s in str(status).split(',') if s.strip()]
+        if statuses:
+            qset = qset.filter(models.Problem.status.in_(statuses))
+    
+    # Filter by priority if provided
+    if priority:
+        priorities = [p.strip() for p in str(priority).split(',') if p.strip()]
+        if priorities:
+            qset = qset.filter(models.Problem.priority.in_(priorities))
+    
+    # Filter by location if provided
+    if location:
+        qset = qset.filter(models.Problem.location.ilike(f"%{location}%"))
+    
+    # Search in title and description if query is provided
+    if q:
+        like = f"%{q}%"
+        qset = qset.filter(
+            (models.Problem.title.ilike(like)) | 
+            (models.Problem.description.ilike(like)) |
+            (models.User.name.ilike(like))  # Search in user's name as well
+        )
+    
+    # Define sortable columns
+    col_map = {
+        "date_submitted": models.Problem.date_submitted,
+        "priority": models.Problem.priority,
+        "status": models.Problem.status,
+        "location": models.Problem.location,
+        "user_name": models.User.name  # Allow sorting by user name
+    }
+    
+    # Apply ordering
+    col = col_map.get(order_by, models.Problem.date_submitted)
+    qset = qset.order_by(col.asc() if order_dir == "asc" else col.desc())
+    
+    # Execute query and return results with user information
+    problems = qset.all()
+    return problems
 
 # Officer dashboard summary for current month
 
