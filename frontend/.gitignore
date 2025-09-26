@@ -1,0 +1,5 @@
+village.db
+backend/venv/
+node_modules/
+build/
+.env

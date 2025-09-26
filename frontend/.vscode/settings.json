@@ -1,0 +1,28 @@
+{
+  "css.customData": [
+    ".vscode/css.json"
+  ],
+  "editor.quickSuggestions": {
+    "strings": true,
+    "other": true,
+    "comments": false
+  },
+  "tailwindCSS.includeLanguages": {
+    "javascript": "javascriptreact",
+    "html": "HTML",
+    "css": "postcss"
+  },
+  "editor.autoClosingQuotes": "always",
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "files.associations": {
+    "*.css": "postcss"
+  },
+  "json.schemaDownload.enable": false,
+  "css.lint.unknownAtRules": "ignore",
+  "tailwindCSS.emmetCompletions": true,
+  "tailwindCSS.validate": true,
+  "css.validate": false,
+  "scss.validate": false,
+  "less.validate": false
+}
